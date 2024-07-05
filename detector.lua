@@ -1,4 +1,4 @@
-local version = "detector v1"
+local version = "detector v2"
 
 local net = component.proxy(component.list("internet")())
 
@@ -9,9 +9,9 @@ if err then h.close() error(tostring(err)) end
 fin=nil
 err=nil
 local data = h.read()
-if string.sub(data,1,13) != "local version" then error("Cannot update") end
+if string.sub(data,1,13) ~= "local version" then error("Cannot update") end
 
-if string.match(data,"\"(.+)\"") != version then 
+if string.match(data,"\"(.+)\"") ~= version then 
 	component.invoke(component.list("eeprom")(),"set",data)
 	computer.shutdown(true)
 end
