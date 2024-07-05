@@ -1,4 +1,20 @@
+local version = "detector v1"
+
 local net = component.proxy(component.list("internet")())
+
+local h = net.request("https://raw.githubusercontent.com/Pepa3/Dispecink/master/detector.lua")
+local fin, err
+while not fin and not err do fin,err = h.finishConnect() end
+if err then h.close() error(tostring(err)) end
+fin=nil
+err=nil
+local data = h.read()
+if string.sub(data,1,13) != "local version" then error("Cannot update") end
+
+if string.match(data,"\"(.+)\"") != version then 
+	component.invoke(component.list("eeprom")(),"set",data)
+	computer.shutdown(true)
+end
 
 while true do
   local name, addr, side, old, new = computer.pullSignal()
