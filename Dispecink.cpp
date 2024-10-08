@@ -5,7 +5,7 @@ int wwidth = 800, wheight = 600;
 
 int main(){
     sf::Font font;
-    if(!font.loadFromFile("arial.ttf")){
+    if(!font.loadFromFile("font.ttf")){
         std::cerr << "Could not load font 'arial.ttf'" << std::endl;
         exit(-2);
     }
