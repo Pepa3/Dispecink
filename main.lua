@@ -7,7 +7,8 @@ if not port then assert(false,"Port unspecified") end
 print("Binding on port "..port)
 local server = assert(socket.bind("*", port))
 
-local f,err = io.open("dispecink.log","a")
+local name = os.date("dispecink_%y_%m_%d_%H-%M-%S.log")
+local f,err = io.open(name,"a")
 if err then assert(false, tostring(err)) end
 
 local quit = false

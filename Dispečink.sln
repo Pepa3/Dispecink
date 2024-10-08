@@ -5,21 +5,20 @@ VisualStudioVersion = 16.0.34301.259
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{20A7A4AF-6BFE-40D6-A875-8D3E9FE9258A}"
 	ProjectSection(SolutionItems) = preProject
-		main.lua = main.lua
-		run.sh = run.sh
-	EndProjectSection
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "minecraft", "minecraft", "{071D1891-75C5-45AA-9804-31C1D34F0DA7}"
-	ProjectSection(SolutionItems) = preProject
+		.gitattributes = .gitattributes
+		.gitignore = .gitignore
 		detector.lua = detector.lua
+		main.c = main.c
+		main.lua = main.lua
+		Makefile = Makefile
+		README.md = README.md
+		run.sh = run.sh
+		train2graph.lua = train2graph.lua
 	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
-	EndGlobalSection
-	GlobalSection(NestedProjects) = preSolution
-		{071D1891-75C5-45AA-9804-31C1D34F0DA7} = {20A7A4AF-6BFE-40D6-A875-8D3E9FE9258A}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {FD725EAF-4DA9-4559-BDF2-4B8FF53DA4C2}
