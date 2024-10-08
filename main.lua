@@ -1,5 +1,7 @@
 local socket = require("socket")
-local signal = require("posix.signal")
+local ok, signal = pcall(require, "posix.signal")
+if not ok then signal = nil end
+
 local port = arg[1]
 if not port then assert(false,"Port unspecified") end
 print("Binding on port "..port)
@@ -10,12 +12,14 @@ if err then assert(false, tostring(err)) end
 
 local quit = false
 
-signal.signal(signal.SIGINT, function(signum)
-	quit=true
-	io.write("Exiting\n")
-	f:close()
-	os.exit(128+signum)
-end)
+if signal then
+	signal.signal(signal.SIGINT, function(signum)
+		quit=true
+		io.write("Exiting\n")
+		f:close()
+		os.exit(128+signum)
+	end)
+end
 
 while not quit do
   local client = server:accept()
