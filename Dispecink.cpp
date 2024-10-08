@@ -41,7 +41,9 @@ int main(){
     sf::RenderWindow window(sf::VideoMode(wwidth, wheight), "Dispecink");
     window.setFramerateLimit(30);
     tracks = std::map<int,Track>();
-    tracks[0]=Track(Track::Type::STRAIGHT, 3, 1, -1);//node 0
+    tracks[0] = Track(Track::Type::STRAIGHT, 3, 0, -1);//node 0
+    tracks[1] = Track(Track::Type::CURVE, 3, 3, 0);
+    tracks[2] = Track(Track::Type::STRAIGHT, 0, 3, 0);
 
     while(window.isOpen()){
         sf::Event event;
@@ -60,24 +62,23 @@ int main(){
 
         window.clear(sf::Color::Black);
         for(const auto& t : tracks){
+            int x = 0, y = 0;
+            Track t2 = t.second;
+            while(t2.startId != -1){
+                t2 = tracks[t2.startId];
+                x += t2.width;
+                y += t2.height;
+            }
+            x = x * scale + offsetX;
+            y = y * scale + offsetY;
             if(t.second.type == Track::Type::STRAIGHT){
-
-                int x = 0, y = 0;
-                Track t2 = t.second;
-                while(t2.startId != -1 && tracks[t2.startId].startId != -1){
-                    t2 = tracks[t2.startId];
-                    x += t2.width;
-                    y += t2.height;
-                }
-                x = x * scale + offsetX;
-                y = y * scale + offsetY;
                 sf::Vertex vert[] = {sf::Vertex(sf::Vector2f(x,y)),sf::Vertex(sf::Vector2f(x+t.second.width*scale,y+t.second.height*scale))};
                 window.draw(vert, 2, sf::LineStrip);
             }else if(t.second.type == Track::Type::CURVE){
-                std::cerr << "Not implemented yet!";
+                drawArc(&window, x, y - t.second.height * scale, t.second.width * scale, 90, 90);
             }
         }
-        drawArc(&window, 400, 300, 100, 0, 180);
+        //drawArc(&window, 400, 300, 100, 0, 180);
         window.display();
     }
 
