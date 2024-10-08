@@ -27,7 +27,8 @@ while not quit do
   client:settimeout(10)
   local line, err = client:receive()
   print("Received "..tostring(line))
-  f:write(line)--TODO: timestamps
+  f:write(tostring(os.time()).." ")
+  f:write(line)
   f:write("\n")
   f:flush()
   if not err then client:send("ack\n") end
