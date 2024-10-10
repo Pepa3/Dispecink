@@ -14,7 +14,7 @@ void drawArc(sf::RenderWindow* window, double x, double y, double r, double star
 
 const int wwidth = 800, wheight = 600;
 int offsetX = 400, offsetY = 300;
-double scale = 30;
+double scale = 20;
 int counter = 1;
 class Track{
 public:
@@ -50,7 +50,7 @@ int main(){
 		int id;
 		Track t;
 		in >> id >> t.startId >> (int&)t.type >> t.width >> t.height;
-		if(t.type == Track::Type::CURVE) in >> t.mod;
+		if(t.type == Track::Type::CURVE || t.type == Track::Type::PARALLEL) in >> t.mod;
 		tracks[id] = t;
 	}
 
@@ -89,15 +89,37 @@ int main(){
 			case Track::Type::CURVE:
 				drawArc(&window, x - (t.second.mod == 1 ? t.second.width * scale : 0), y - (t.second.mod == 0 ? t.second.height * scale : 0), t.second.width * scale, t.second.height * t.second.width > 0 ? 90 : 0, 90);
 				break;
-			case Track::Type::PARALLEL:
-				double r = (abs(t.second.width) + abs(t.second.height)) / 2.f * 25.f;// i dont know why but scale-5
-				double x1 = x;
-				double y1 = y + (t.second.height < 0 ? -r : r);
-				drawArc(&window, x1, y1, r, t.second.height * t.second.width > 0 ? -35 : 90, 55);//dont know why either - 45+10°
-				double x2 = x + t.second.width * scale;
-				double y2 = y + t.second.height * scale - (t.second.height < 0 ? -r : r);
-				//std::cout << r << " " << x1 << " " << y1 << " " << y << " " << x2 << " " << y2 << std::endl;
-				drawArc(&window, x2, y2, r, t.second.height * t.second.width > 0 ? 145 : -90, 55);
+			case Track::Type::PARALLEL://TODO: shrink
+				double r = (abs(t.second.width) + abs(t.second.height)) / 2.f * scale*5/6;// i dont know why but scale-5
+				if(t.second.mod == 0){//horizontal
+					double x1 = x;
+					double x2 = x + t.second.width * scale;
+					if(t.second.width > 0){
+						double y1 = y + (t.second.height < 0 ? -r : r);
+						double y2 = y + t.second.height * scale - (t.second.height < 0 ? -r : r);
+						drawArc(&window, x1, y1, r, t.second.height > 0 ? -35 : 90, 55);//dont know why either - 45+10°
+						drawArc(&window, x2, y2, r, t.second.height > 0 ? 145 : -90, 55);
+					} else{
+						double y1 = y - (t.second.height < 0 ? -r : r);
+						double y2 = y + t.second.height * scale - (t.second.height < 0 ? (-r / 25 * 15) : (r / 25 * 15));
+						drawArc(&window, x1, y1, r, t.second.height > 0 ? 145 : -90, 55);
+						drawArc(&window, x2, y2, r, t.second.height > 0 ? -35 : 90, 55);
+					}
+				} else if(t.second.mod==1){//vertical
+					double y1 = y;
+					double y2 = y + t.second.height * scale;
+					if(t.second.height > 0){
+						double x1 = x + (t.second.width < 0 ? -r : r);
+						double x2 = x + t.second.width * scale - (t.second.width < 0 ? -r : r);
+						drawArc(&window, x1, y1, r, t.second.width > 0 ? 180 : 55, 55);
+						drawArc(&window, x2, y2, r, t.second.width > 0 ? 0 : 235, 55);
+					} else{
+						double x1 = x - (t.second.width < 0 ? -r : r);
+						double x2 = x + t.second.width * scale - (t.second.width < 0 ? (-r / 25 * 15) : (r / 25 * 15));
+						drawArc(&window, x1, y1, r, t.second.width > 0 ? 0 : 235, 55);
+						drawArc(&window, x2, y2, r, t.second.width > 0 ? 180 : 55, 55);
+					}
+				}
 				break;
 			}
 		}
