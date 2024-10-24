@@ -2,6 +2,7 @@
 #include <SFML/Graphics.hpp>
 #include <cmath>
 #include <fstream>
+#include <cassert>
 
 const double PI = 3.1415926;
 const int wwidth = 800, wheight = 600;
@@ -37,7 +38,6 @@ public:
 	}
 };
 
-Track::Type editSelType = Track::Type::STRAIGHT;
 Track editGhost = Track(Track::Type::CURVE, 2, 2, {}, 0);
 
 std::map<int,Track> tracks;
@@ -59,7 +59,7 @@ void render(sf::RenderWindow& window, Track t){
 		window.draw(vert, 2, sf::LineStrip);
 		break;
 	case Track::Type::CURVE:
-		drawArc(&window, x - (mod == 1 ? width * scale : 0), y - (mod == 0 ? height * scale : 0), width * scale, height * width > 0 ? 90 : 0, 90);
+		drawArc(&window, x - (mod == 1 ? width * scale : 0), y + (mod == 0 ? height * scale : 0), width * scale, (mod*2-1)* height * width > 0 ? 90 : 0, 90);
 		break;
 	case Track::Type::PARALLEL://TODO: shrink
 		double r = (abs(width) + abs(height)) / 2.f * scale * 5 / 6;// i dont know why but scale-5
@@ -106,6 +106,11 @@ int main(){
 	window.setFramerateLimit(30);
 	tracks = std::map<int,Track>();
 	tracks[0] = Track(Track::Type::STRAIGHT, 0, 0, {offsetX, offsetY}, -1);//node 0
+	sf::Text editText = sf::Text();
+	editText.setFont(font);
+	editText.setCharacterSize(18);
+	editText.setFillColor(sf::Color::Cyan);
+	editText.setString("Width: " + std::to_string(editGhost.width) + ", Height: " + std::to_string(-editGhost.height));
 
 	std::ifstream in = std::ifstream("stanice");
 	while(!in.eof() && !in.bad()){
@@ -127,16 +132,17 @@ int main(){
 				if(key == sf::Keyboard::Q){
 					window.close();
 				} else if(key == sf::Keyboard::Right){
-					(*((int*)&editSelType))++;//TODO:???
-					if(editSelType > Track::Type::COUNT)editSelType = Track::Type::STRAIGHT;
+					editGhost.width++;
 				} else if(key == sf::Keyboard::Left){
-					(*((int*)&editSelType))--;
-					if(editSelType < Track::Type::STRAIGHT)editSelType = Track::Type::COUNT;
+					editGhost.width--;
+				} else if(key == sf::Keyboard::Down){
+					editGhost.height++;
+				} else if(key == sf::Keyboard::Up){
+					editGhost.height--;
 				}
+				editText.setString("Width: "+std::to_string(editGhost.width) +", Height: " + std::to_string(-editGhost.height));
 			} else if(event.type == sf::Event::MouseMoved){
 				double mx = event.mouseMove.x, my = event.mouseMove.y;
-				//removing tracks?
-				//track length? - snapped to ?x ?
 				unsigned best = -1;
 				for(const auto& t : tracks){
 					Track t2;
@@ -152,6 +158,26 @@ int main(){
 			} else if(event.type == sf::Event::MouseButtonPressed){
 				if(event.mouseButton.button == sf::Mouse::Left){
 					
+				} else if(event.mouseButton.button == sf::Mouse::Right){
+					(*((int*) &editGhost.type))++;
+					if(editGhost.type > Track::Type::COUNT)editGhost.type = Track::Type::STRAIGHT;
+					switch(editGhost.type){
+					case Track::Type::STRAIGHT:
+						editGhost.width = 3;
+						editGhost.height = 0;
+						break;
+					case Track::Type::CURVE:
+						editGhost.width = 3;
+						editGhost.height = 3;
+						break;
+					case Track::Type::PARALLEL:
+						editGhost.width = 4;
+						editGhost.height = 2;
+						break;
+					default:
+						assert(false);
+					}
+					editText.setString("Width: " + std::to_string(editGhost.width) + ", Height: " + std::to_string(-editGhost.height));
 				}
 			}
 		}
@@ -162,6 +188,7 @@ int main(){
 		color = sf::Color::Cyan;
 		render(window,editGhost);
 		color = sf::Color::White;
+		window.draw(editText);
 		window.display();
 	}
 
